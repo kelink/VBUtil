@@ -1,0 +1,42 @@
+Option Strict Off
+
+Option Explicit On
+
+Imports System.IO.File
+
+Module LinuxUtil
+
+    Public Function GetWinSCPSessionOptions(ByVal hostName As String, ByVal userName As String, ByVal password As String, ByVal sshHostKeyFingerprint As String) As SessionOptions
+        ' Setup session options
+        Dim WinSCPSessionOptions As New SessionOptions
+        Try
+            With WinSCPSessionOptions
+                .Protocol = Protocol.Sftp
+                .HostName = hostName
+                .UserName = userName
+                .Password = password
+                .SshHostKeyFingerprint = sshHostKeyFingerprint
+                ' .SshHostKeyFingerprint = "ssh-rsa 2048 xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx"
+            End With
+        Catch ex As Exception
+            WinSCPSessionOptions = Nothing
+        End Try
+        Return WinSCPSessionOptions
+    End Function
+
+    Public Function ExecuteSSHCommand(ByVal WinScpOption As SessionOptions, ByVal Command As String) As WinSCP.CommandExecutionResult
+        Dim Output As WinSCP.CommandExecutionResult = Nothing
+        Try
+            Using mySession As Session = New Session
+                ' Connect
+                mySession.Open(WinScpOption)
+                ' Execute command
+                Output = mySession.ExecuteCommand(Command)
+            End Using
+        Catch e As Exception
+        End Try
+        Return Output
+    End Function
+
+
+End Module
