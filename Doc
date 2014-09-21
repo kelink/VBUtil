@@ -1,0 +1,170 @@
+URL
+http://blog.csdn.net/wzy0623/article/details/7318688
+
+ cmd下用winscp上传windows数据到linux
+分类： Linux 2012-03-04 20:13 1191人阅读 评论(0) 收藏 举报
+windowscmd文件传输工具工作服务器session
+ 
+要执行的命令保存成文件willrun,内容: 
+
+option confirm off 
+open user:pwd@host1 
+put c:\test.txt /root/tmp 
+close 
+open user:pwd@host2 
+put c:\test.txt /root/tmp 
+close 
+open user:pwd@host3 
+synchronize remote c:\tmp /root/tmp -delete-----如果在目标机器存在，则加delete参数 
+close 
+exit 
+
+保存。然后执行cmd 
+"c:\Program Files\WinSCP\WinSCP.exe" /console /script=c:\willrun.txt
+
+======================================================================================================
+
+WinScp 的自动化脚本如下
+
+更多用法见 winscp -?
+---------------------------------------
+option batch on
+option confirm off
+option transfer binary
+
+open cc@127.0.0.1
+put c:\bak
+put c:\NG.rar
+
+close
+exit
+
+
+
+########
+
+WinSCP命令行使用小记
+
+WinSCP是一个Windows环境下使用SSH的开源图形化SFTP客户端。同时支持SCP协议。它的主要功能就是在本地与远程计算机间安全的复制文件。
+
+直接在cmd下输入winscp进入winscp操作介面，查看帮助直接在下面输入help就可以看到所以可用到的命令。
+
+连接到远程机器：
+open username@192.168.1.9
+输入密码就成功登录了。
+
+输入help:
+winscp> help
+call     执行任意远程Shell命令
+cd       改变远程工作目录
+chmod    改变远程文件权限
+close    关闭会话
+exit     关闭所有会话并结束程序
+get      从远程目录下载文件到本地目录
+help     显示帮助
+keepuptodate 在一个远程目录连续反映本地目录的改变
+lcd      改变本地工作目录
+lls      列出本地目录的内容
+ln       新建远程符号链接
+lpwd     显示本地工作目录
+ls       列出远程目录的内容
+mkdir    新建远程目录
+mv       移动或者重命名远程文件
+open     连接到服务器
+option   设置或显示脚本选项的值
+put      从本地目录上传文件到远程目录
+pwd      显示远程工作目录
+rm       删除远程文件
+rmdir    删除远程目录
+session  列出连接的会话或者选择活动会话
+synchronize 用一个本地目录同步远程目录
+
+呵呵，都出来了，现在来大概说几个我喜欢用的命令吧。
+
+比如说第一个call,如果在windows机器，传输文件时需要用到linux下的高级命令，就可以使用call命令来帮忙了，例，我现在要查看/etc/passwd文件内容:
+call cat /etc/passwd
+
+如果要查看某个命令的具体使用方法用：
+help command
+例，现在不记得synchroize的具体命令方法了，现在我可以使用:
+help synchronize
+winscp> help synchronize
+synchronize local|remote|both [ [ ] ]
+  当第一个参数是'local'时，用远程与本地同步。
+当第一个参数是'remote'时用本地目录同步远程目录。
+当第一个参数是'both'用一个同步另一个。
+当目录没有指定时，同步当前工作目录。
+如果'synchdelete'设置为'on'，旧文件会被删除。
+注意：对这个命令，覆盖确认永远是关闭的。
+影响的选项：
+  transfer, synchdelete, exclude, include
+范例：
+  synchronize remote
+  synchronize both d:\www /home/martin/public_html
+
+虽然只是个文件传输工具，相当于类似于ftp之类的工具，但这玩意功能相当强大，值得了解下！很多黑客们都用这玩意！
+
+
+
+winscp命令行批处理读远程服务器文件例子文章分类:操作系统
+
+option echo off
+option batch on
+option confirm off
+open scp://root:123456@192.168.1.60
+get /opt/backup/gnome-libs-1.4.2.tar.bz2 e:\bb\gnome-libs-1.4.2.tar.bz2
+close
+exit
+
+
+
+
+网上总有文章说有这命令那命令，可就是一个例子没见着。
+
+
+
+
+还有同步整个文件夹的方法synchronize：
+
+
+option echo off
+option batch on
+option confirm off
+open scp://root:123456@192.168.1.60
+cd /opt/backup/
+option transfer binary
+option synchdelete off
+synchronize local e:\bb
+close
+exit
+
+
+
+
+通过例子应该明白网上那些所谓的废材命令怎么用了吧。
+
+另外废材命令如下：
+
+call     执行任意远程Shell命令
+cd       改变远程工作目录
+chmod    改变远程文件权限
+close    关闭会话
+exit     关闭所有会话并结束程序
+get      从远程目录下载文件到本地目录
+help     显示帮助
+keepuptodate 在一个远程目录连续反映本地目录的改变
+lcd      改变本地工作目录
+lls      列出本地目录的内容
+ln       新建远程符号链接
+lpwd     显示本地工作目录
+ls       列出远程目录的内容
+mkdir    新建远程目录
+mv       移动或者重命名远程文件
+open     连接到服务器
+option   设置或显示脚本选项的值
+put      从本地目录上传文件到远程目录
+pwd      显示远程工作目录
+rm       删除远程文件
+rmdir    删除远程目录
+session 列出连接的会话或者选择活动会话
+synchronize 用一个本地目录同步远程目录
