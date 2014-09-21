@@ -1,0 +1,32 @@
+二、如何确定Shell语句调用的程序已经关闭 
+这个标题确实太长，但它确实概括了本节的内容。 当你需要等待由Shell启动的应用程序运行完毕时， 便会发现Shell语句只管调用，之后就撒手不管了，于 是我们不得不动用一下API函数了。当然我们可以用 API来完成全部的工作，但是如果那样的话，我们将要 面临CreateProcess这个非常复杂的函数，光写下它 和相关结构类型的宣告就超出一页纸了。别误会，我说这些的目的只是为了让大家体会到下面我们将要做 的是多么简单的事。 
+只需按以下步骤step by step，便OK了。 
+1．新建一个项目，在窗体上放一个command1，再 添加一个Module。 
+2. 在Module中写入如下代码： 
+Option Explicit 
+以下声明了OpenProcess，GetExitCodeProcess 和Closeandle 三个API函数 
+Public Declare Function OpenProcess Lib"ker nel32"（ByVal dwDesiredAccess As Long， ByVal bInheritHandle As Long， ByVal dwProcessId As Long）As Long 
+Public Declare Function GetExitcodeProcess Lib “kernel32”（ByVal hProcess As Long， 1pExitcode As Long） As Long 
+Public Declare Function Closellandle Lib "Ker nel32”（ByVal hobject As Long) As Long 
+Publi Const PROCESS_QUERY_INFORMATION= ＆H400 
+Public Const STATUS_PENDING ＝ ＆H103＆ 
+3．打开窗体的代码窗口，写入如下代码： 
+Option Explicit 
+Private Sub RunShell（cmdline As String） 这个自定义过程完成了所有工作 
+Dim hProcess As Long 
+Dim ProcessId As Long 
+Dim exitCode As Long 
+ProcessId ＝ Shell（cmdline，1）'此处利用了 Shell当函数使用时返回的任务标识 
+hProcess＝OpenProcess（PROCESS_QUERY_INFOR MATION，False，ProcessId） 
+Do 
+Ca11 GetExitCodeProcess（hProcess，exitcode) 
+DoEvents 
+Loop While exitCode ＝ STATUS_PENDING 
+Call CloseHandle（hProcess) 
+MsgBox cmdline ＆ "已经关闭。" 
+End Sub 
+Private Sub Command1_Click（） 
+RunShell ”notepad.exe” 
+End Sub 
+4．按F5运行，单击Command1运行计事本，关闭 计事本将弹出对话框“notepad.exe 已经关闭。” 
+注意：由于本程序是用一个Do..Loop循环来侦测 进程的结束，所以那句DoEvents是绝不能少的，不然 你就只能用Ctrl＋Break来退出了。 
