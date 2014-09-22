@@ -15,7 +15,8 @@ Module LinuxUtil
                 .HostName = hostName
                 .UserName = userName
                 .Password = password
-                .SshHostKeyFingerprint = sshHostKeyFingerprint
+                .GiveUpSecurityAndAcceptAnySshHostKey = True
+                '.SshHostKeyFingerprint = sshHostKeyFingerprint
                 ' .SshHostKeyFingerprint = "ssh-rsa 2048 xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx"
             End With
         Catch ex As Exception
